@@ -27,6 +27,7 @@ add_executable(app
 main.cpp 
 ${TEMP}
 stb_image.cpp
+window.cpp
 shader.cpp
 )
 

@@ -1,66 +1,13 @@
 #include <iostream>
 #include <cmath>
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
-
 #include "shader.hpp"
+#include "window.hpp"
 #include "stb_image.hpp"
-
-void process_input(GLFWwindow *window)
-{
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-}
-
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
 
 int main()
 {
-    if (!glfwInit())
-    {
-        std::cout << "GLFW couldn't get initiallized :( \n";
-        return -1;
-    }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-    GLFWwindow *window = glfwCreateWindow(800, 800, "Practical OpenGL", nullptr, nullptr);
-    if (!window)
-    {
-        std::cout << "GLFW faild to create window :( \n";
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
-    {
-        std::cout << "glad could load the opengl funtions correctly";
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        return -1;
-    }
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    Window window;
 
     // Shader Program
     Shader shader_program("./shaders/vertex.glsl", "./shaders/fragment.glsl");
@@ -127,10 +74,10 @@ int main()
 
     stbi_image_free(data);
 
-    while (!glfwWindowShouldClose(window))
+    while (!window.should_close())
     {
-        glfwPollEvents();
-        process_input(window);
+        window.poll_events();
+        window.process_input();
 
         glClearColor(0.f, 0.f, 0.3f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -138,13 +85,11 @@ int main()
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        glfwSwapBuffers(window);
+        window.swap_buffers();
     }
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
     return 0;
 }
