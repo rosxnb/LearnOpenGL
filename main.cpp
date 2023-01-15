@@ -1,9 +1,9 @@
-#include <iostream>
-#include <cmath>
-
 #include "shader.hpp"
 #include "window.hpp"
 #include "stb_image.hpp"
+#include "vertex_array.hpp"
+#include "index_buffer.hpp"
+#include "vertex_buffer.hpp"
 
 int main()
 {
@@ -27,27 +27,15 @@ int main()
         0, 2, 3
     };
 
-    unsigned int VAO, VBO, IBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &IBO);
+    VertexArray vao;
+    VertexBuffer vbo;
+    IndexBuffer ibo;
 
-    glBindVertexArray(VAO);
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), static_cast<void *>(0));
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    }   
-    glBindVertexArray(0);
+    vbo.record_data(sizeof(vertices), vertices);
+    vao.set_attribute(0, 3, 8 * sizeof(float), 0);
+    vao.set_attribute(1, 3, 8 * sizeof(float), 3 * sizeof(float));
+    vao.set_attribute(2, 2, 8 * sizeof(float), 6 * sizeof(float));
+    ibo.record_indices(sizeof(indices), indices);
 
     // Textures
     unsigned int texture; 
@@ -82,14 +70,12 @@ int main()
         glClearColor(0.f, 0.f, 0.3f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindVertexArray(VAO);
+        vao.bind();
+        ibo.bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         window.swap_buffers();
     }
-
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
 
     return 0;
 }

@@ -29,6 +29,9 @@ ${TEMP}
 stb_image.cpp
 window.cpp
 shader.cpp
+vertex_array.cpp
+vertex_buffer.cpp
+index_buffer.cpp
 )
 
 # Specify path to include directories 
