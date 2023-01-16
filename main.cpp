@@ -38,8 +38,19 @@ int main()
     vbo.unbind();
     ibo.record_indices(sizeof(indices), indices);
 
-    Texture tex("resources/tree.png");
+    shader_program.set_int("tex_unit0", 0);
+    shader_program.set_int("tex_unit1", 1);
 
+    Texture tex0("resources/tree.png", 0);
+    tex0.unbind();
+
+    Texture tex1("resources/awesomeface.png", 1);
+    tex1.unbind();
+
+    vao.bind();
+    ibo.bind();
+    tex0.bind();
+    tex1.bind();
     while (!window.should_close())
     {
         window.poll_events();
@@ -48,8 +59,6 @@ int main()
         glClearColor(0.f, 0.f, 0.3f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        vao.bind();
-        ibo.bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         window.swap_buffers();
