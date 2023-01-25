@@ -5,6 +5,10 @@
 #include "vertex_buffer.hpp"
 #include "texture.hpp"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 int main()
 {
     Window window(1200, 1000);
@@ -47,6 +51,18 @@ int main()
     Texture tex1("resources/awesomeface.png", 1);
     tex1.unbind();
 
+
+
+    // Mathematics setion
+    glm::mat4 scale(1.f);
+    scale = glm::scale(scale, glm::vec3(0.5f, 0.5f, 0.5f));
+    glm::mat4 translate(1.f);
+    translate = glm::translate(translate, glm::vec3(0.f, -0.5f, 0.f));
+
+    auto shader_id = shader_program.get_id();
+    auto transform_loc = glGetUniformLocation(shader_id, "transform");
+
+
     vao.bind();
     ibo.bind();
     tex0.bind();
@@ -58,6 +74,11 @@ int main()
 
         glClearColor(0.f, 0.f, 0.3f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glm::mat4 rotate(1.f);
+        rotate = glm::rotate(rotate, static_cast<float>(glfwGetTime()), glm::vec3(0.f, 0.f, 1.f));
+        glm::mat4 transform = translate * rotate * scale;
+        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm::value_ptr(transform));
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
