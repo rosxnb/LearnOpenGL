@@ -12,35 +12,78 @@
 int main()
 {
     Window window(1200, 1000);
+    glEnable(GL_DEPTH_TEST);
 
     // Shader Program
     Shader shader_program("./shaders/vertex.glsl", "./shaders/fragment.glsl");
     shader_program.use();
 
+
     // Data and data objects
     constexpr float vertices[] = {
-        // positions        // colors         // texture coords
-        0.7f,  0.7f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-        0.7f, -0.7f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-        -0.7f, -0.7f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-        -0.7f,  0.7f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    constexpr unsigned int indices[] = {
-        0, 1, 2,
-        0, 2, 3
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f), 
+        glm::vec3( 2.0f,  5.0f, -15.0f), 
+        glm::vec3(-1.5f, -2.2f, -2.5f),  
+        glm::vec3(-3.8f, -2.0f, -12.3f),  
+        glm::vec3( 2.4f, -0.4f, -3.5f),  
+        glm::vec3(-1.7f,  3.0f, -7.5f),  
+        glm::vec3( 1.3f, -2.0f, -2.5f),  
+        glm::vec3( 1.5f,  2.0f, -2.5f), 
+        glm::vec3( 1.5f,  0.2f, -1.5f), 
+        glm::vec3(-1.3f,  1.0f, -1.5f)  
     };
 
     VertexArray vao;
     VertexBuffer vbo;
-    IndexBuffer ibo;
 
     vbo.record_data(sizeof(vertices), vertices);
-    vao.set_attribute(0, 3, 8 * sizeof(float), 0);
-    vao.set_attribute(1, 3, 8 * sizeof(float), 3 * sizeof(float));
-    vao.set_attribute(2, 2, 8 * sizeof(float), 6 * sizeof(float));
+    vao.set_attribute(0, 3, 5 * sizeof(float), 0);
+    vao.set_attribute(1, 2, 5 * sizeof(float), 3 * sizeof(float));
     vbo.unbind();
-    ibo.record_indices(sizeof(indices), indices);
 
     shader_program.set_int("tex_unit0", 0);
     shader_program.set_int("tex_unit1", 1);
@@ -52,19 +95,17 @@ int main()
     tex1.unbind();
 
 
+    glm::mat4 view(1.f);
+    view = glm::translate(view, glm::vec3(0.f, 0.f, -3.f));
+    shader_program.set_mat4("view", view);
 
-    // Mathematics setion
-    glm::mat4 scale(1.f);
-    scale = glm::scale(scale, glm::vec3(0.5f, 0.5f, 0.5f));
-    glm::mat4 translate(1.f);
-    translate = glm::translate(translate, glm::vec3(0.f, -0.5f, 0.f));
-
-    auto shader_id = shader_program.get_id();
-    auto transform_loc = glGetUniformLocation(shader_id, "transform");
+    glm::mat4 projection(1.f);
+    auto [width, height] = window.get_buffer_size();
+    projection = glm::perspective(glm::radians(45.f), width / height, 0.1f, 100.f);
+    shader_program.set_mat4("projection", projection);
 
 
     vao.bind();
-    ibo.bind();
     tex0.bind();
     tex1.bind();
     while (!window.should_close())
@@ -73,14 +114,17 @@ int main()
         window.process_input();
 
         glClearColor(0.f, 0.f, 0.3f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 rotate(1.f);
-        rotate = glm::rotate(rotate, static_cast<float>(glfwGetTime()), glm::vec3(0.f, 0.f, 1.f));
-        glm::mat4 transform = translate * rotate * scale;
-        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm::value_ptr(transform));
+        for (int i = 0; i < 10; ++i)
+        {
+            glm::mat4 model(1.f);
+            model = glm::translate(model, cubePositions[i]);
+            model = glm::rotate(model, (float) glfwGetTime(), glm::vec3(1.f, 0.3f, 0.5f));
+            shader_program.set_mat4("model", model);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         window.swap_buffers();
     }
