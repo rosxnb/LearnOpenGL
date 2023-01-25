@@ -2,6 +2,7 @@
 #define SHADER_H
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -23,6 +24,7 @@ class Shader
         void set_bool(const char *name, bool value) const;
         void set_int(const char *name, int value) const;
         void set_float(const char *name, float value) const;
+        void set_mat4(const char *name, glm::mat4 mat) const;
 
         ~Shader();
 

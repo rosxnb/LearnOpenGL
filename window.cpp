@@ -69,6 +69,12 @@ void Window::clear()
     glfwTerminate();
 }
 
+std::pair<float, float> Window::get_buffer_size()
+{
+    glfwGetFramebufferSize(m_window, &m_width, &m_height);
+    return {static_cast<float>(m_width), static_cast<float>(m_height)};
+}
+
 Window::~Window()
 {
     clear();

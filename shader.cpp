@@ -66,6 +66,17 @@ void Shader::set_float(const char *name, float value) const
     glUniform1f(loc, value);
 }
 
+void Shader::set_mat4(const char *name, glm::mat4 mat) const
+{
+    int loc = locate_uniform(name);
+    if (loc == -1)
+    {
+        std::cout << "ERROR uniform: " << name << ", couldn't be found! \n";
+        return;
+    }
+    glUniformMatrix4fv(loc, 1, GL_FALSE, &mat[0][0]);
+}
+
 Shader::~Shader()
 {
     glUseProgram(0);

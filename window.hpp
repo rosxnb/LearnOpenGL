@@ -17,10 +17,13 @@ class Window
         void swap_buffers() const;
         void poll_events() const;
         void process_input() const;
+
+        std::pair<float, float> get_buffer_size();
+
         ~Window();
 
     private:
-        unsigned int m_width, m_height;
+        int m_width, m_height;
         GLFWwindow *m_window;
 
         static void framebuffer_size_callback(GLFWwindow *window, int width, int height);
