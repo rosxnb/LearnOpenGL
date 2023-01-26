@@ -11,10 +11,91 @@
 
 #include <cmath>
 
-struct Camera
+bool firstMouse = true;
+float yaw   = -90.0f;
+float pitch =  0.0f;
+float lastX =  1200.0f / 2.0;
+float lastY =  1000.0 / 2.0;
+float fov   =  45.0f;
+
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+
+float deltaTime = 0.f;
+float lastFrame = 0.f;
+
+void process_input(GLFWwindow *window)
 {
-    float x, y, z;
-};
+    float cameraSpeed = 2.5f * deltaTime;
+
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraFront;
+
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f; // change this value to your liking
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(front);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    fov -= (float)yoffset;
+    if (fov < 1.0f)
+        fov = 1.0f;
+    if (fov > 45.0f)
+        fov = 45.0f;
+}
 
 int main()
 {
@@ -102,23 +183,31 @@ int main()
     tex1.unbind();
 
 
-
     glm::mat4 projection(1.f);
     auto [width, height] = window.get_buffer_size();
-    projection = glm::perspective(glm::radians(45.f), width / height, 0.1f, 100.f);
-    shader_program.set_mat4("projection", projection);
 
+    GLFWwindow *W = window.get_window();
+    glfwSetInputMode(W, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(W, mouse_callback);
+    glfwSetScrollCallback(W, scroll_callback);
 
     vao.bind();
     tex0.bind();
     tex1.bind();
     while (!window.should_close())
     {
+        float currentTime = glfwGetTime();
+        deltaTime = currentTime - lastFrame;
+        lastFrame = currentTime;
+
         window.poll_events();
-        window.process_input();
+        process_input(W);
 
         glClearColor(0.f, 0.f, 0.3f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        projection = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.f);
+        shader_program.set_mat4("projection", projection);
 
         for (int i = 0; i < 10; ++i)
         {
@@ -130,10 +219,8 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        float radius {10.f};
-        Camera cam {(float)sin(glfwGetTime()) * radius, 0.f, (float)cos(glfwGetTime()) * radius};
         glm::mat4 view(1.f);
-        view = glm::lookAt(glm::vec3(cam.x, cam.y, cam.z), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         shader_program.set_mat4("view", view);
 
         window.swap_buffers();
