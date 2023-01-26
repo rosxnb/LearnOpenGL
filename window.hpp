@@ -19,6 +19,7 @@ class Window
         void process_input() const;
 
         std::pair<float, float> get_buffer_size();
+        GLFWwindow* get_window();
 
         ~Window();
 

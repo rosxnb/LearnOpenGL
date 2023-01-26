@@ -75,6 +75,11 @@ std::pair<float, float> Window::get_buffer_size()
     return {static_cast<float>(m_width), static_cast<float>(m_height)};
 }
 
+GLFWwindow* Window::get_window()
+{
+    return m_window;
+}
+
 Window::~Window()
 {
     clear();
