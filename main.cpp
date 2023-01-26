@@ -9,6 +9,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <cmath>
+
+struct Camera
+{
+    float x, y, z;
+};
+
 int main()
 {
     Window window(1200, 1000);
@@ -95,9 +102,6 @@ int main()
     tex1.unbind();
 
 
-    glm::mat4 view(1.f);
-    view = glm::translate(view, glm::vec3(0.f, 0.f, -3.f));
-    shader_program.set_mat4("view", view);
 
     glm::mat4 projection(1.f);
     auto [width, height] = window.get_buffer_size();
@@ -125,6 +129,12 @@ int main()
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+
+        float radius {10.f};
+        Camera cam {(float)sin(glfwGetTime()) * radius, 0.f, (float)cos(glfwGetTime()) * radius};
+        glm::mat4 view(1.f);
+        view = glm::lookAt(glm::vec3(cam.x, cam.y, cam.z), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+        shader_program.set_mat4("view", view);
 
         window.swap_buffers();
     }
