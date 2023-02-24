@@ -33,6 +33,7 @@ vertex_array.cpp
 vertex_buffer.cpp
 index_buffer.cpp
 texture.cpp
+camera.cpp
 )
 
 # Specify path to include directories 
