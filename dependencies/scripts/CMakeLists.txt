@@ -18,26 +18,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_COMPILE_FLAGS}")
 # Name of the project 
 project(OpenGL_Setup VERSION 0.0.1)
 
+set(DEPENDENCY_ROOT_PATH "~/Dependencies/opengl/")
+set(TEMP ${DEPENDENCY_ROOT_PATH})
+string(APPEND TEMP glad.c)
 
 # Generate the application executable
-add_executable(app 
-src/main.cpp 
-src/window.cpp
-src/shader.cpp
-src/vertex_array.cpp
-src/vertex_buffer.cpp
-src/index_buffer.cpp
-src/texture.cpp
-src/camera.cpp
-dependencies/src/glad.c
-dependencies/src/stb_image.cpp
-)
+add_executable(app main.cpp ${TEMP})
 
 # Specify path to include directories 
-target_include_directories(app PRIVATE dependencies/include)
+target_include_directories(app PRIVATE ~/Dependencies/opengl/include/)
 
 # Specify path to libraries
-target_link_directories(app PRIVATE dependencies/library)
+target_link_directories(app PRIVATE ~/Dependencies/opengl/library/)
 
 target_link_libraries(app libglfw.3.3.dylib)
 
